@@ -42,6 +42,10 @@ public:
     long last_N;
     int count;                      //!< Number of characters read in the current line of serial input
     char line_buffer[MAX_CMD_SIZE]; //!< The current line accumulator
+    #if ENABLED(MJM_IN_USE)
+      int8_t info[MJM_INFO_BUFFER_SIZE];     // type could be wrong maybe uint8_t better ? 
+      int info_count;
+    #endif
     uint8_t input_state;            //!< The input state
   };
 
@@ -61,6 +65,9 @@ public:
     bool skip_ok;                   //!< Skip sending ok when command is processed?
     #if HAS_MULTI_SERIAL
       serial_index_t port;          //!< Serial port the command was received on
+    #endif
+    #ifdef MJM_IN_USE
+      int8_t info[MJM_INFO_BUFFER_SIZE];     // type could be wrong maybe uint8_t better ? 
     #endif
   };
 
@@ -84,6 +91,9 @@ public:
     );
 
     bool enqueue(const char *cmd, const bool skip_ok=true
+      OPTARG(HAS_MULTI_SERIAL, serial_index_t serial_ind = serial_index_t())
+    );
+       bool enqueue_MJM(const char *cmd,const int8_t *info,int info_size, const bool skip_ok=true
       OPTARG(HAS_MULTI_SERIAL, serial_index_t serial_ind = serial_index_t())
     );
 

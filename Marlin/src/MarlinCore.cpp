@@ -1120,6 +1120,7 @@ inline void tmc_standby_setup() {
  *  - Set Marlin to RUNNING State
  */
 void setup() {
+
   #ifdef FASTIO_INIT
     FASTIO_INIT();
   #endif
@@ -1134,7 +1135,7 @@ void setup() {
   const byte mcu = hal.get_reset_source();
   hal.clear_reset_source();
 
-  #if ENABLED(MARLIN_DEV_MODE)
+  #if ENABLED(MARLIN_DEV_MOD)        // statt MARLIN_DEV_MOD
     auto log_current_ms = [&](PGM_P const msg) {
       SERIAL_ECHO_START();
       TSS('[', millis(), F("] ")).echo();
@@ -1646,6 +1647,7 @@ void setup() {
   SETUP_LOG("setup() completed.");
 
   TERN_(MARLIN_TEST_BUILD, runStartupTests());
+
 }
 
 /**
@@ -1669,14 +1671,16 @@ void loop() {
       if (card.flag.abort_sd_printing) abortSDPrinting();
       if (marlin_state == MF_SD_COMPLETE) finishSDPrinting();
     #endif
-
+    
     queue.advance();
+
 
     #if ANY(POWER_OFF_TIMER, POWER_OFF_WAIT_FOR_COOLDOWN)
       powerManager.checkAutoPowerOff();
     #endif
 
     endstops.event_handler();
+    
 
     TERN_(HAS_TFT_LVGL_UI, printer_state_polling());
 

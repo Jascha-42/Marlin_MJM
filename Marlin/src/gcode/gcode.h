@@ -607,6 +607,10 @@ private:
 
   static void G92();
 
+  #if ENABLED(MJM_IN_USE)
+    static void G100(int8_t *info);
+  #endif
+
   #if ENABLED(CALIBRATION_GCODE)
     static void G425();
   #endif

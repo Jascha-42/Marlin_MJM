@@ -453,11 +453,13 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 91: set_relative_mode(true);  break;                   // G91: Relative Mode
 
       case 92: G92(); break;                                      // G92: Set current axis position(s)
-
+      #if ENABLED(MJM_IN_USE)
+      case 100: G100(queue.ring_buffer.peek_next_command().info);break;
+      #endif
       #if ENABLED(CALIBRATION_GCODE)
         case 425: G425(); break;                                  // G425: Perform calibration with calibration cube
       #endif
-
+                                                                      // implement G100 --> move with printing
       #if ENABLED(DEBUG_GCODE_PARSER)
         case 800: parser.debug(); break;                          // G800: GCode Parser Test for G
       #endif

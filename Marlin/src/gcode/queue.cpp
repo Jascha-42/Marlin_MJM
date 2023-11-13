@@ -122,6 +122,18 @@ bool GCodeQueue::RingBuffer::enqueue(const char *cmd, const bool skip_ok/*=true*
   return true;
 }
 
+
+ 
+bool GCodeQueue::RingBuffer::enqueue_MJM(const char *cmd,const int8_t *info,int info_size, const bool skip_ok/*=true*/
+  OPTARG(HAS_MULTI_SERIAL, serial_index_t serial_ind/*=-1*/)
+) {
+  if (*cmd == ';' || length >= BUFSIZE) return false;
+  strcpy(commands[index_w].buffer, cmd);
+  memcpy(commands[index_w].info, info,info_size);
+
+  commit_command(skip_ok OPTARG(HAS_MULTI_SERIAL, serial_ind));
+  return true;
+}
 /**
  * Enqueue with Serial Echo
  * Return true if the command was consumed
@@ -335,11 +347,73 @@ FORCE_INLINE bool is_M29(const char * const cmd) {  // matches "M29" & "M29 ", b
   return m29 && !NUMERIC(m29[3]);
 }
 
-#define PS_NORMAL 0
+#define PS_NORMAL 0   // no bracketcomment started
 #define PS_EOL    1
 #define PS_QUOTED 2
-#define PS_PAREN  3
+#define PS_PAREN  3   // bracketcomment started
 #define PS_ESC    4
+
+inline void process_stream_char_MJM(const char c, uint8_t &sis, char (&buff)[MAX_CMD_SIZE], int &ind,int8_t (&info)[MJM_INFO_BUFFER_SIZE], int &info_ind) {
+
+  if (sis == PS_EOL) return;    // EOL comment or overflow
+
+  #if ENABLED(PAREN_COMMENTS)
+    else if (sis == PS_PAREN) { // Inline comment
+    SERIAL_ECHOPGM("before parental");
+      if (c == ')') sis = PS_NORMAL;
+      #ifdef MJM_IN_USE
+      
+      else{ info[info_ind++] =c;
+      SERIAL_ECHOPGM("in parental");
+        if (info_ind >= MJM_INFO_BUFFER_SIZE - 1) sis = PS_EOL;             // Skip the rest on overflow
+      }
+      #endif
+      
+      return;
+    }
+  #endif
+
+  else if (sis >= PS_ESC)       // End escaped char
+    sis -= PS_ESC;
+
+  else if (c == '\\') {         // Start escaped char
+    sis += PS_ESC;
+    if (sis == PS_ESC) return;  // Keep if quoting
+  }
+
+  #if ENABLED(GCODE_QUOTED_STRINGS)
+
+    else if (sis == PS_QUOTED) {
+      if (c == '"') sis = PS_NORMAL; // End quoted string
+    }
+    else if (c == '"')          // Start quoted string
+      sis = PS_QUOTED;
+
+  #endif
+
+  else if (c == ';') {          // Start end-of-line comment
+    sis = PS_EOL;
+    return;
+  }
+
+  #if ENABLED(PAREN_COMMENTS)
+    else if (c == '(') {        // Start inline comment
+      sis = PS_PAREN;
+      return;
+    }
+  #endif
+
+  // Backspace erases previous characters
+  if (c == 0x08) {
+    if (ind) buff[--ind] = '\0';
+  }
+  else {
+    buff[ind++] = c;
+    if (ind >= MAX_CMD_SIZE - 1)
+      sis = PS_EOL;             // Skip the rest on overflow
+  }
+}
+
 
 inline void process_stream_char(const char c, uint8_t &sis, char (&buff)[MAX_CMD_SIZE], int &ind) {
 
@@ -348,6 +422,8 @@ inline void process_stream_char(const char c, uint8_t &sis, char (&buff)[MAX_CMD
   #if ENABLED(PAREN_COMMENTS)
     else if (sis == PS_PAREN) { // Inline comment
       if (c == ')') sis = PS_NORMAL;
+
+      
       return;
     }
   #endif
@@ -404,7 +480,7 @@ inline bool process_line_done(uint8_t &sis, char (&buff)[MAX_CMD_SIZE], int &ind
   if (is_empty)
     thermalManager.task();            // Keep sensors satisfied
   else
-    ind = 0;                          // Start a new line
+    ind = 0;                         // Start a new line
   return is_empty;                    // Inform the caller
 }
 
@@ -468,8 +544,13 @@ void GCodeQueue::get_serial_commands() {
       if (ISEOL(serial_char)) {
 
         // Reset our state, continue if the line was empty
-        if (process_line_done(serial.input_state, serial.line_buffer, serial.count))
+        if (process_line_done(serial.input_state, serial.line_buffer, serial.count)){
+          
+          #ifdef MJM_IN_USE
+            serial.info_count =0;
+          #endif
           continue;
+        }
 
         char* command = serial.line_buffer;
 
@@ -553,10 +634,20 @@ void GCodeQueue::get_serial_commands() {
         #endif
 
         // Add the command to the queue
+        #if ENABLED(MJM_IN_USE)
+        ring_buffer.enqueue_MJM(serial.line_buffer,serial.info,serial.info_count, false OPTARG(HAS_MULTI_SERIAL, p));
+        serial.info_count =0;
+        #else
         ring_buffer.enqueue(serial.line_buffer, false OPTARG(HAS_MULTI_SERIAL, p));
+        #endif
       }
       else
-        process_stream_char(serial_char, serial.input_state, serial.line_buffer, serial.count);
+        #if ENABLED(MJM_IN_USE)
+          process_stream_char_MJM(serial_char, serial.input_state, serial.line_buffer, serial.count,serial.info,serial.info_count);
+        #else
+          process_stream_char(serial_char, serial.input_state, serial.line_buffer, serial.count);
+        #endif
+
 
     } // NUM_SERIAL loop
   } // queue has space, serial has data
@@ -577,6 +668,7 @@ void GCodeQueue::get_serial_commands() {
     if (!IS_SD_FETCHING()) return;
 
     int sd_count = 0;
+    int info_index =0;
     while (!ring_buffer.full() && !card.eof()) {
       const int16_t n = card.get();
       const bool card_eof = card.eof();
@@ -611,7 +703,11 @@ void GCodeQueue::get_serial_commands() {
         if (card.eof()) card.fileHasFinished();         // Handle end of file reached
       }
       else
-        process_stream_char(sd_char, sd_input_state, command.buffer, sd_count);
+        #if ENABLED(MJM_IN_USE)
+          process_stream_char_MJM(sd_char, sd_input_state, command.buffer, sd_count,command.info,info_index);   // no great coding style
+        #else
+          process_stream_char(sd_char, sd_input_state, command.buffer, sd_count);     // no great coding style
+        #endif
     }
   }
 
