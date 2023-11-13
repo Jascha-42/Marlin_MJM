@@ -529,9 +529,9 @@ xyze_int8_t Stepper::count_direction{0};
 #endif
 
 void Stepper::enable_axis(const AxisEnum axis) {
-  #define _CASE_ENABLE(N) case N##_AXIS: ENABLE_AXIS_##N(); break;
+  // #define _CASE_ENABLE(N) case N##_AXIS: ENABLE_AXIS_##N(); break;
   switch (axis) {
-    MAIN_AXIS_MAP(_CASE_ENABLE)
+    //MAIN_AXIS_MAP(_CASE_ENABLE)
     default: break;
   }
   mark_axis_enabled(axis);
@@ -545,11 +545,11 @@ bool Stepper::disable_axis(const AxisEnum axis) {
   // If all the axes that share the enabled bit are disabled
   const bool can_disable = can_axis_disable(axis);
   if (can_disable) {
-    #define _CASE_DISABLE(N) case N##_AXIS: DISABLE_AXIS_##N(); break;
-    switch (axis) {
-      MAIN_AXIS_MAP(_CASE_DISABLE)
-      default: break;
-    }
+    // #define _CASE_DISABLE(N) case N##_AXIS: DISABLE_AXIS_##N(); break;
+    // switch (axis) {
+    //   MAIN_AXIS_MAP(_CASE_DISABLE)
+    //   default: break;
+    // }
   }
   return can_disable;
 }
@@ -557,57 +557,63 @@ bool Stepper::disable_axis(const AxisEnum axis) {
 #if HAS_EXTRUDERS
 
   void Stepper::enable_extruder(E_TERN_(const uint8_t eindex)) {
-    IF_DISABLED(HAS_MULTI_EXTRUDER, constexpr uint8_t eindex = 0);
-    #define _CASE_ENA_E(N) case N: ENABLE_AXIS_E##N(); mark_axis_enabled(E_AXIS E_OPTARG(eindex)); break;
-    switch (eindex) {
-      REPEAT(E_STEPPERS, _CASE_ENA_E)
-    }
+    // IF_DISABLED(HAS_MULTI_EXTRUDER, constexpr uint8_t eindex = 0);
+    // #define _CASE_ENA_E(N) case N: ENABLE_AXIS_E##N(); 
+    mark_axis_enabled(E_AXIS E_OPTARG(eindex)); //break;
+    // switch (eindex) {
+    //   REPEAT(E_STEPPERS, _CASE_ENA_E)
+    // }
+    return;
   }
 
   bool Stepper::disable_extruder(E_TERN_(const uint8_t eindex/*=0*/)) {
-    IF_DISABLED(HAS_MULTI_EXTRUDER, constexpr uint8_t eindex = 0);
+    // IF_DISABLED(HAS_MULTI_EXTRUDER, constexpr uint8_t eindex = 0);
     mark_axis_disabled(E_AXIS E_OPTARG(eindex));
     const bool can_disable = can_axis_disable(E_AXIS E_OPTARG(eindex));
     if (can_disable) {
-      #define _CASE_DIS_E(N) case N: DISABLE_AXIS_E##N(); break;
-      switch (eindex) { REPEAT(E_STEPPERS, _CASE_DIS_E) }
+      // #define _CASE_DIS_E(N) case N: DISABLE_AXIS_E##N(); break;
+      // switch (eindex) { REPEAT(E_STEPPERS, _CASE_DIS_E) }
     }
     return can_disable;
   }
 
   void Stepper::enable_e_steppers() {
-    #define _ENA_E(N) ENABLE_EXTRUDER(N);
-    REPEAT(EXTRUDERS, _ENA_E)
+    // #define _ENA_E(N) ENABLE_EXTRUDER(N);
+    // REPEAT(EXTRUDERS, _ENA_E)
+    return;
   }
 
   void Stepper::disable_e_steppers() {
-    #define _DIS_E(N) DISABLE_EXTRUDER(N);
-    REPEAT(EXTRUDERS, _DIS_E)
+    // #define _DIS_E(N) DISABLE_EXTRUDER(N);
+    // REPEAT(EXTRUDERS, _DIS_E)
+    return;
   }
 
 #endif
 
 void Stepper::enable_all_steppers() {
-  TERN_(AUTO_POWER_CONTROL, powerManager.power_on());
-  NUM_AXIS_CODE(
-    enable_axis(X_AXIS), enable_axis(Y_AXIS), enable_axis(Z_AXIS),
-    enable_axis(I_AXIS), enable_axis(J_AXIS), enable_axis(K_AXIS),
-    enable_axis(U_AXIS), enable_axis(V_AXIS), enable_axis(W_AXIS)
-  );
-  enable_e_steppers();
+//   TERN_(AUTO_POWER_CONTROL, powerManager.power_on());
+//   NUM_AXIS_CODE(
+//     enable_axis(X_AXIS), enable_axis(Y_AXIS), enable_axis(Z_AXIS),
+//     enable_axis(I_AXIS), enable_axis(J_AXIS), enable_axis(K_AXIS),
+//     enable_axis(U_AXIS), enable_axis(V_AXIS), enable_axis(W_AXIS)
+//   );
+//   enable_e_steppers();
 
-  TERN_(EXTENSIBLE_UI, ExtUI::onSteppersEnabled());
+   TERN_(EXTENSIBLE_UI, ExtUI::onSteppersEnabled());
+return;
 }
 
 void Stepper::disable_all_steppers() {
-  NUM_AXIS_CODE(
-    disable_axis(X_AXIS), disable_axis(Y_AXIS), disable_axis(Z_AXIS),
-    disable_axis(I_AXIS), disable_axis(J_AXIS), disable_axis(K_AXIS),
-    disable_axis(U_AXIS), disable_axis(V_AXIS), disable_axis(W_AXIS)
-  );
-  disable_e_steppers();
+  // NUM_AXIS_CODE(
+  //   disable_axis(X_AXIS), disable_axis(Y_AXIS), disable_axis(Z_AXIS),
+  //   disable_axis(I_AXIS), disable_axis(J_AXIS), disable_axis(K_AXIS),
+  //   disable_axis(U_AXIS), disable_axis(V_AXIS), disable_axis(W_AXIS)
+  // );
+  // disable_e_steppers();
 
-  TERN_(EXTENSIBLE_UI, ExtUI::onSteppersDisabled());
+  // TERN_(EXTENSIBLE_UI, ExtUI::onSteppersDisabled());
+  return;
 }
 
 // Set a single axis direction based on the last set flags.
@@ -2908,7 +2914,7 @@ void Stepper::init() {
   #if HAS_E7_DIR
     E7_DIR_INIT();
   #endif
-
+/*
   // Init Enable Pins - steppers default to disabled.
   #if HAS_X_ENABLE
     #ifndef X_ENABLE_INIT_STATE
@@ -3034,7 +3040,7 @@ void Stepper::init() {
     E7_ENABLE_INIT();
     if (E7_ENABLE_INIT_STATE) E7_ENABLE_WRITE(E7_ENABLE_INIT_STATE);
   #endif
-
+*/
   #define _STEP_INIT(AXIS) AXIS ##_STEP_INIT()
   #define _WRITE_STEP(AXIS, HIGHLOW) AXIS ##_STEP_WRITE(HIGHLOW)
   #define _DISABLE_AXIS(AXIS) DISABLE_AXIS_## AXIS()

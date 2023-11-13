@@ -41,10 +41,11 @@ extern xyze_pos_t destination;
   feedRate_t fast_move_feedrate = MMM_TO_MMS(G0_FEEDRATE);
 #endif
 
+
 /**
  * G100 movment like G0, G1: Coordinated movement of X Y Z E axes but with one fire sequence for the nozzles
  */
-void GcodeSuite::G100(int8_t *info) {
+void GcodeSuite::G100(int8_t info[MJM_INFO_BUFFER_SIZE]) {
   if (!MOTION_CONDITIONS) return;
 
   TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_RUNNING));
@@ -93,8 +94,26 @@ void GcodeSuite::G100(int8_t *info) {
 
   
   //for (info;info<= info + MJM_INFO_BUFFER_SIZE;info++){     
-  SERIAL_ECHOPGM("before info");  SERIAL_ECHOPGM("\t"); 
-  SERIAL_ECHOPGM(info);
+  //SERIAL_ECHOPGM("before info");  SERIAL_ECHOPGM("\t"); 
+  //SERIAL_ECHOPGM(info);
+  //SERIAL_ECHOPGM("", info[0]);
+  //SERIAL_ECHOPGM("", sizeof(info));
+  int16_t data = 0;
+
+  for (int i =0; i< MJM_INFO_BUFFER_SIZE;i++){  // Converts the binary data of contained in the chars int an int16_t 
+    //SERIAL_ECHOPGM("-", info[i]);
+    if (info[i] != 0){
+    data = data << 6;
+    info [i] = info[i] & ~64;
+    data = data | info[i];
+    //SERIAL_ECHOPGM(" ", data);
+    }
+    //SERIAL_ECHOPGM("_", data);
+  }
+  fireHp(data);
+
+
+  
   
   
 

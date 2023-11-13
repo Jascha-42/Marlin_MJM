@@ -181,22 +181,22 @@
     SET_INPUT_PULLUP(MKS_TEST_POWER_LOSS_PIN);
     SET_INPUT_PULLUP(MKS_TEST_PS_ON_PIN);
     SET_INPUT_PULLUP(SERVO0_PIN);
-
-    #if HAS_X_AXIS
-      OUT_WRITE(X_ENABLE_PIN, LOW);
-    #endif
-    #if HAS_Y_AXIS
-      OUT_WRITE(Y_ENABLE_PIN, LOW);
-    #endif
-    #if HAS_Z_AXIS
-      OUT_WRITE(Z_ENABLE_PIN, LOW);
-    #endif
-    #if HAS_EXTRUDERS
-      OUT_WRITE(E0_ENABLE_PIN, LOW);
-    #endif
-    #if HAS_MULTI_EXTRUDER && DISABLED(MKS_HARDWARE_TEST_ONLY_E0)
-      OUT_WRITE(E1_ENABLE_PIN, LOW);
-    #endif
+    // enabling of steppers is disabled to get more usable pins
+    // #if HAS_X_AXIS
+    //   OUT_WRITE(X_ENABLE_PIN, LOW);
+    // #endif
+    // #if HAS_Y_AXIS
+    //   OUT_WRITE(Y_ENABLE_PIN, LOW);
+    // #endif
+    // #if HAS_Z_AXIS
+    //   OUT_WRITE(Z_ENABLE_PIN, LOW);
+    // #endif
+    // #if HAS_EXTRUDERS
+    //   OUT_WRITE(E0_ENABLE_PIN, LOW);
+    // #endif
+    // #if HAS_MULTI_EXTRUDER && DISABLED(MKS_HARDWARE_TEST_ONLY_E0)
+    //   OUT_WRITE(E1_ENABLE_PIN, LOW);
+    // #endif
 
     #if ENABLED(MKS_HARDWARE_TEST_ONLY_E0)
       SET_INPUT_PULLUP(PA1);

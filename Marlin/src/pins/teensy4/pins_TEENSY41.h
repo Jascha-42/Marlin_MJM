@@ -41,16 +41,16 @@
  *  Y_DIR_PIN                   PWM  3 |               | 22  A8 PWM              SERVO0_PIN
  *  Z_STEP_PIN                  PWM  4 |               | 21  A7      RX5
  *  Z_DIR_PIN                   PWM  5 |               | 20  A6      TX5         FILWIDTH_PIN
- *  X_ENABLE_PIN                PWM  6 |               | 19  A5 PWM        SCL0
- *  Y_ENABLE_PIN           RX2  PWM  7 |               | 18  A4 PWM        SDA0  HEATER_1_PIN
- *  Z_ENABLE_PIN           TX2  PWM  8 |               | 17  A3      RX4   SDA1
+ *  X_ENABLE_PIN     *          PWM  6 |               | 19  A5 PWM        SCL0
+ *  Y_ENABLE_PIN     *     RX2  PWM  7 |               | 18  A4 PWM        SDA0  HEATER_1_PIN
+ *  Z_ENABLE_PIN     *     TX2  PWM  8 |               | 17  A3      RX4   SDA1
  *  E0_STEP_PIN                 PWM  9 |               | 16  A2      TX4   SCL1  TEMP_0_PIN
  *  E0_DIR_PIN                  PWM 10 |               | 15  A1 PWM  RX3         TEMP_BED_PIN
- *  MOSI_PIN       MOSI0        PWM 11 |               | 14  A0 PWM  TX3         TEMP_1_PIN
+ *  MOSI_PIN       MOSI0        PWM 11 |               | 14  A0 PWM  TX3    *    TEMP_1_PIN
  *  MISO_PIN       MISO0        PWM 12 |               | 13 LED PWM  SCK0        SCK_PIN
  *                                3.3V |               | GND
  *  Z_STOP_PIN                  PWM 24 |               | 41 A17
- *  E0_ENABLE_PIN               PWM 25 |               | 40 A16
+ *  E0_ENABLE_PIN     *         PWM 25 |               | 40 A16
  *  FAN0_PIN       MOSI1            26 |               | 39 A15      MISO1       X_STOP_PIN
  *  Z-PROBE PWR    SCK1             27 | *  *  *  *  * | 38 A14                  Y_STOP_PIN
  *  SOL1_PIN               RX7  PWM 28 |               | 37     PWM              HEATER_0_PIN
@@ -78,26 +78,26 @@
 //
 #define X_STEP_PIN                             0
 #define X_DIR_PIN                              1
-#define X_ENABLE_PIN                           6
+#define X_ENABLE_PIN                           39
 //#define X_CS_PIN                            30
 
 #define Y_STEP_PIN                             2
 #define Y_DIR_PIN                              3
-#define Y_ENABLE_PIN                           7
+#define Y_ENABLE_PIN                           39
 //#define Y_CS_PIN                            31
 
 #define Z_STEP_PIN                             4
 #define Z_DIR_PIN                              5
-#define Z_ENABLE_PIN                           8
+#define Z_ENABLE_PIN                           39
 //#define Z_CS_PIN                            32
 
 #define E0_STEP_PIN                            9
 #define E0_DIR_PIN                            10
-#define E0_ENABLE_PIN                         25
+#define E0_ENABLE_PIN                         39
 
 #define E1_STEP_PIN                           33
 #define E1_DIR_PIN                            34
-#define E1_ENABLE_PIN                         35
+#define E1_ENABLE_PIN                         39
 
 //
 // Heaters / Fans
@@ -113,7 +113,7 @@
 // Temperature Sensors
 //
 #define TEMP_0_PIN                             2  // Extruder / Analog pin numbering: 2 => A2
-#define TEMP_1_PIN                             0
+#define TEMP_1_PIN                             7
 #define TEMP_BED_PIN                           1  // Bed / Analog pin numbering
 
 //
@@ -126,4 +126,13 @@
 
 #ifndef SDCARD_CONNECTION
   #define SDCARD_CONNECTION              ONBOARD
+#endif
+
+
+#ifdef MJM_IN_USE
+#define MJM_data1 6
+#define MJM_data2 7
+#define MJM_data3 8
+#define MJM_data4 25
+#define MJM_fire  14
 #endif

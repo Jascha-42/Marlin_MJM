@@ -1121,9 +1121,12 @@ inline void tmc_standby_setup() {
  */
 void setup() {
 
+
+
   #ifdef FASTIO_INIT
     FASTIO_INIT();
   #endif
+
 
   #ifdef BOARD_PREINIT
     BOARD_PREINIT(); // Low-level init (before serial init)
@@ -1384,9 +1387,9 @@ void setup() {
     SETUP_RUN(endstops.enable_z_probe(false));
   #endif
 
-  #if HAS_STEPPER_RESET
-    SETUP_RUN(enableStepperDrivers());
-  #endif
+  // #if HAS_STEPPER_RESET
+  //   SETUP_RUN(enableStepperDrivers());
+  // #endif
 
   #if HAS_MOTOR_CURRENT_I2C
     SETUP_RUN(digipot_i2c.init());
