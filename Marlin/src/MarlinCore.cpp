@@ -1121,7 +1121,13 @@ inline void tmc_standby_setup() {
  */
 void setup() {
 
+  pinMode(MJM_fire,OUTPUT);
+  pinMode(MJM_data1,OUTPUT);
+  pinMode(MJM_data2,OUTPUT);
+  pinMode(MJM_data3,OUTPUT);
+  pinMode(MJM_data4,OUTPUT);
 
+  digitalWriteFast(MJM_fire,LOW);
 
   #ifdef FASTIO_INIT
     FASTIO_INIT();

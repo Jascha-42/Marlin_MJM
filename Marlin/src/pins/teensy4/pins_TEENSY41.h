@@ -78,31 +78,31 @@
 //
 #define X_STEP_PIN                             0
 #define X_DIR_PIN                              1
-#define X_ENABLE_PIN                           39
+#define X_ENABLE_PIN                           29
 //#define X_CS_PIN                            30
 
 #define Y_STEP_PIN                             2
 #define Y_DIR_PIN                              3
-#define Y_ENABLE_PIN                           39
+#define Y_ENABLE_PIN                           29
 //#define Y_CS_PIN                            31
 
 #define Z_STEP_PIN                             4
 #define Z_DIR_PIN                              5
-#define Z_ENABLE_PIN                           39
+#define Z_ENABLE_PIN                           29
 //#define Z_CS_PIN                            32
 
 #define E0_STEP_PIN                            9
 #define E0_DIR_PIN                            10
-#define E0_ENABLE_PIN                         39
+#define E0_ENABLE_PIN                         29
 
 #define E1_STEP_PIN                           33
 #define E1_DIR_PIN                            34
-#define E1_ENABLE_PIN                         39
+#define E1_ENABLE_PIN                         29
 
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN                          37
+#define HEATER_0_PIN                          29//37
 #define HEATER_1_PIN                          18
 #define HEATER_BED_PIN                        36
 #ifndef FAN0_PIN
@@ -113,7 +113,7 @@
 // Temperature Sensors
 //
 #define TEMP_0_PIN                             2  // Extruder / Analog pin numbering: 2 => A2
-#define TEMP_1_PIN                             7
+#define TEMP_1_PIN                             29
 #define TEMP_BED_PIN                           1  // Bed / Analog pin numbering
 
 //
@@ -134,5 +134,5 @@
 #define MJM_data2 7
 #define MJM_data3 8
 #define MJM_data4 25
-#define MJM_fire  14
+#define MJM_fire  37
 #endif
