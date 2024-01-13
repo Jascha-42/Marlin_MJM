@@ -1139,7 +1139,7 @@ void setup() {
   #endif
 
   tmc_standby_setup();  // TMC Low Power Standby pins must be set early or they're not usable
-
+  
   // Check startup - does nothing if bootloader sets MCUSR to 0
   const byte mcu = hal.get_reset_source();
   hal.clear_reset_source();
@@ -1177,7 +1177,6 @@ void setup() {
     #endif
   #endif
   SERIAL_ECHOLNPGM("start");
-
   // Set up these pins early to prevent suicide
   #if HAS_KILL
     SETUP_LOG("KILL_PIN");

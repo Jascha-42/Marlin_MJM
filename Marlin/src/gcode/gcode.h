@@ -609,6 +609,7 @@ private:
 
   #if ENABLED(MJM_IN_USE)
     static void G100(int8_t info[MJM_INFO_BUFFER_SIZE]);
+    static void G101(int8_t info[MJM_INFO_BUFFER_SIZE]);
     static void fireHp(int16_t info);
   #endif
 

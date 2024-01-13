@@ -1457,7 +1457,7 @@ float get_move_distance(const xyze_pos_t &diff OPTARG(HAS_ROTATIONAL_AXES, bool 
   }
 
   /**
-   * Prepare a linear move in a dual X axis setup
+   *  a linear move in a dual X axis setup
    *
    * Return true if current_position[] was set to destination[]
    */

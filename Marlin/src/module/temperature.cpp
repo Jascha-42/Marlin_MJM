@@ -2916,39 +2916,39 @@ void Temperature::init() {
   HAL_timer_start(MF_TIMER_TEMP, TEMP_TIMER_FREQUENCY);
   ENABLE_TEMPERATURE_INTERRUPT();
 
-  #if HAS_AUTO_FAN
-    #define _OREFAN(I,N) || _EFANOVERLAP(I,N)
-    #if HAS_AUTO_FAN_0
-      INIT_E_AUTO_FAN_PIN(E0_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_FAN_1 && !_EFANOVERLAP(0,1)
-      INIT_E_AUTO_FAN_PIN(E1_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_FAN_2 && !(0 REPEAT2(2, _OREFAN, 2))
-      INIT_E_AUTO_FAN_PIN(E2_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_FAN_3 && !(0 REPEAT2(3, _OREFAN, 3))
-      INIT_E_AUTO_FAN_PIN(E3_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_FAN_4 && !(0 REPEAT2(4, _OREFAN, 4))
-      INIT_E_AUTO_FAN_PIN(E4_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_FAN_5 && !(0 REPEAT2(5, _OREFAN, 5))
-      INIT_E_AUTO_FAN_PIN(E5_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_FAN_6 && !(0 REPEAT2(6, _OREFAN, 6))
-      INIT_E_AUTO_FAN_PIN(E6_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_FAN_7 && !(0 REPEAT2(7, _OREFAN, 7))
-      INIT_E_AUTO_FAN_PIN(E7_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_CHAMBER_FAN && !AUTO_CHAMBER_IS_E
-      INIT_CHAMBER_AUTO_FAN_PIN(CHAMBER_AUTO_FAN_PIN);
-    #endif
-    #if HAS_AUTO_COOLER_FAN && !AUTO_COOLER_IS_E
-      INIT_COOLER_AUTO_FAN_PIN(COOLER_AUTO_FAN_PIN);
-    #endif
-  #endif // HAS_AUTO_FAN
+//   #if HAS_AUTO_FAN                     // !!!!!!!!!!!!!!! fan mifht has problems now
+//     #define _OREFAN(I,N) || _EFANOVERLAP(I,N)
+//     #if HAS_AUTO_FAN_0
+//       INIT_E_AUTO_FAN_PIN(E0_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_FAN_1 && !_EFANOVERLAP(0,1)
+//       INIT_E_AUTO_FAN_PIN(E1_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_FAN_2 && !(0 REPEAT2(2, _OREFAN, 2))
+//       INIT_E_AUTO_FAN_PIN(E2_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_FAN_3 && !(0 REPEAT2(3, _OREFAN, 3))
+//       INIT_E_AUTO_FAN_PIN(E3_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_FAN_4 && !(0 REPEAT2(4, _OREFAN, 4))
+//       INIT_E_AUTO_FAN_PIN(E4_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_FAN_5 && !(0 REPEAT2(5, _OREFAN, 5))
+//       INIT_E_AUTO_FAN_PIN(E5_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_FAN_6 && !(0 REPEAT2(6, _OREFAN, 6))
+//       INIT_E_AUTO_FAN_PIN(E6_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_FAN_7 && !(0 REPEAT2(7, _OREFAN, 7))
+//       INIT_E_AUTO_FAN_PIN(E7_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_CHAMBER_FAN && !AUTO_CHAMBER_IS_E
+//       INIT_CHAMBER_AUTO_FAN_PIN(CHAMBER_AUTO_FAN_PIN);
+//     #endif
+//     #if HAS_AUTO_COOLER_FAN && !AUTO_COOLER_IS_E
+//       INIT_COOLER_AUTO_FAN_PIN(COOLER_AUTO_FAN_PIN);
+//     #endif
+//   #endif // HAS_AUTO_FAN
 
   #if HAS_HOTEND
     #define _TEMP_MIN_E(NR) do{ \
@@ -2958,6 +2958,7 @@ void Temperature::init() {
       while (analog_to_celsius_hotend(temp_range[NR].raw_min, NR) < tmin) \
         temp_range[NR].raw_min += TEMPDIR(NR) * (OVERSAMPLENR); \
     }while(0)
+
     #define _TEMP_MAX_E(NR) do{ \
       const celsius_t tmax_tmp = TERN(TEMP_SENSOR_##NR##_IS_CUSTOM, 2000, int16_t(pgm_read_word(&TEMPTABLE_##NR [TEMP_SENSOR_##NR##_MAXTEMP_IND].celsius)) - 1), \
                       tmax = _MIN(HEATER_##NR##_MAXTEMP, tmax_tmp); \
@@ -3042,7 +3043,7 @@ void Temperature::init() {
   #if ALL(HAS_TEMP_SOC, THERMAL_PROTECTION_SOC)
     while (analog_to_celsius_soc(maxtemp_raw_SOC) > SOC_MAXTEMP) maxtemp_raw_SOC -= OVERSAMPLENR;
   #endif
-
+  
   #if HAS_TEMP_REDUNDANT
     temp_redundant.target = &(
       #if REDUNDANT_TEMP_MATCH(TARGET, COOLER) && HAS_TEMP_COOLER
@@ -3060,6 +3061,7 @@ void Temperature::init() {
       #endif
     );
   #endif
+
 }
 
 #if HAS_THERMAL_PROTECTION

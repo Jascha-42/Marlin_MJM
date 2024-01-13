@@ -31,9 +31,9 @@
 
 #include "../../sd/cardreader.h"
 
-#if ENABLED(NANODLP_Z_SYNC)
-  #include "../../module/planner.h"
-#endif
+
+#include "../../module/planner.h"
+
 
 extern xyze_pos_t destination;
 
@@ -43,9 +43,9 @@ extern xyze_pos_t destination;
 
 
 /**
- * G100 movment like G0, G1: Coordinated movement of X Y Z E axes but with one fire sequence for the nozzles
+ * G101 movment like G0, G1: Coordinated movement of X Y Z E axes but with one row of fire sequences for the nozzles
  */
-void GcodeSuite::G100(int8_t info[MJM_INFO_BUFFER_SIZE]) {
+void GcodeSuite::G101(int8_t info[MJM_INFO_BUFFER_SIZE]) {
   if (!MOTION_CONDITIONS) return;
 
   TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_RUNNING));
@@ -59,9 +59,11 @@ void GcodeSuite::G100(int8_t info[MJM_INFO_BUFFER_SIZE]) {
       }
     #endif
   #endif
-
+  float Stepsize = 0.1;
+  float Abstand = 4;
   get_destination_from_command();                 // Get X Y [Z[I[J[K]]]] [E] F (and set cutter power)
-
+  if (parser.seenval('V'))  Stepsize = parser.value_float();
+  if (parser.seenval('W'))  Abstand = parser.value_float();
   #ifdef G0_FEEDRATE
     if (fast_move) {
       #if ENABLED(VARIABLE_G0_FEEDRATE)
@@ -92,57 +94,41 @@ void GcodeSuite::G100(int8_t info[MJM_INFO_BUFFER_SIZE]) {
 
   #endif // FWRETRACT
 
-  
-  //for (info;info<= info + MJM_INFO_BUFFER_SIZE;info++){     
-  //SERIAL_ECHOPGM("before info");  SERIAL_ECHOPGM("\t"); 
-  //SERIAL_ECHOPGM(info);
-  //SERIAL_ECHOPGM("", info[0]);
-  //SERIAL_ECHOPGM("", sizeof(info));
+  #define NOZZLECOUNT   12
+  int16_t feedrate = 20;
   int16_t data = 0;
-  #define NOZZLECOUNT 12
-  for (int i =0; i< int(NOZZLECOUNT/6)+1;i++){  // Converts the binary data of contained in the chars int an int16_t 
-    SERIAL_ECHOPGM("-", info[i]);
-    if (info[i] != 0){
-    data = data << 6;
-    info [i] = info[i] & (~64);
-    data = data | info[i];
-    SERIAL_ECHOPGM(" ", data);
+  bool dataInside = false;
+  for (int i =0;i<= Abstand/Stepsize;i++){
+    if (destination.x > current_position.x){ current_position.x = current_position.x + Stepsize;}    // sollte für alle Achsen verallgeeinert werden
+    else{current_position.x -= Stepsize;}
+    planner.buffer_line(current_position, feedrate);
+    delayMicroseconds(30);
+}
+  for (int j = 0 ; j < int( MJM_INFO_BUFFER_SIZE /2);j++){
+    for (int i =0; i< int((NOZZLECOUNT-1)/6)+1;i++){  // Converts the binary data of contained in the chars int an int16_t 
+      //SERIAL_ECHOPGM("-", info[i]);
+      if (info[j*(int((NOZZLECOUNT-1)/6)+1)+i] != 0){
+      dataInside = true;
+      data = data << 6;
+      info[j*(int((NOZZLECOUNT-1)/6)+1)+i] = info[j*(int((NOZZLECOUNT-1)/6)+1)+i] & (~64);
+      data = data | info[j*(int((NOZZLECOUNT-1)/6)+1)+i];
+      //SERIAL_ECHOPGM(" ", data);
+      }
+      else{dataInside = false;}
+      //SERIAL_ECHOPGM("_", data);
     }
-    SERIAL_ECHOPGM("_", data);
+    if (dataInside){
+      if (destination.x > current_position.x){ current_position.x = current_position.x + Stepsize;}
+      else{current_position.x -= Stepsize;}
+      planner.buffer_line(current_position, feedrate);
+      fireHp(data);
+    }
   }
-  fireHp(data);
-
-
-  
-  
-  
-
-
-
-
-  #if ANY(IS_SCARA, POLAR)
-    fast_move ? prepare_fast_move_to_destination() : prepare_line_to_destination();
-  #else
-    prepare_line_to_destination();
-  #endif
+  planner.buffer_line(destination,feedrate);
+  current_position = destination;
 
   #ifdef G0_FEEDRATE
     // Restore the motion mode feedrate
     if (fast_move) feedrate_mm_s = old_feedrate;
-  #endif
-
-  #if ENABLED(NANODLP_Z_SYNC)
-    #if ENABLED(NANODLP_ALL_AXIS)
-      #define _MOVE_SYNC parser.seenval('X') || parser.seenval('Y') || parser.seenval('Z')  // For any move wait and output sync message
-    #else
-      #define _MOVE_SYNC parser.seenval('Z')  // Only for Z move
-    #endif
-    if (_MOVE_SYNC) {
-      planner.synchronize();
-      SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
-    }
-    TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_IDLE));
-  #else
-    TERN_(FULL_REPORT_TO_HOST_FEATURE, report_current_grblstate_moving());
   #endif
 }

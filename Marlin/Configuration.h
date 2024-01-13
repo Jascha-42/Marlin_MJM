@@ -73,13 +73,13 @@
 
 #define MJM_IN_USE
 
-#define MJM_INFO_BUFFER_SIZE 5
+#define MJM_INFO_BUFFER_SIZE 1000    // Not great that a huge buffer is 
 
 #define PAREN_COMMENTS
 
 
 
-//--------------------------------------- MJM STUF END ----------------------------
+//--------------------------------------- MJM STUFF END ----------------------------
 
 
 // Choose the name from boards.h that matches your setup
@@ -1240,7 +1240,7 @@
  * Override with M92
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 20, 20, 100, 500 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }
 
 /**
  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
@@ -1799,7 +1799,7 @@
 #define Z_MIN_POS 0
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
-#define Z_MAX_POS 54
+#define Z_MAX_POS 57
 //#define I_MIN_POS 0
 //#define I_MAX_POS 50
 //#define J_MIN_POS 0

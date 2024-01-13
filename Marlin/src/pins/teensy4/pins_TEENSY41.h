@@ -134,5 +134,5 @@
 #define MJM_data2 7
 #define MJM_data3 8
 #define MJM_data4 25
-#define MJM_fire  37
+#define MJM_fire  14
 #endif

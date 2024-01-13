@@ -359,12 +359,12 @@ inline void process_stream_char_MJM(const char c, uint8_t &sis, char (&buff)[MAX
 
   #if ENABLED(PAREN_COMMENTS)
     else if (sis == PS_PAREN) { // Inline comment
-    SERIAL_ECHOPGM("before parental");
+    
       if (c == ')') sis = PS_NORMAL;
       #ifdef MJM_IN_USE
       
       else{ info[info_ind++] =c;
-      SERIAL_ECHOPGM("in parental");
+      
         if (info_ind >= MJM_INFO_BUFFER_SIZE - 1) sis = PS_EOL;             // Skip the rest on overflow
       }
       #endif
