@@ -126,7 +126,7 @@ void GcodeSuite::G101(int8_t info[MJM_INFO_BUFFER_SIZE]) {
   }
   planner.buffer_line(destination,feedrate);
   current_position = destination;
-
+memset(info,0,MJM_INFO_BUFFER_SIZE);
   #ifdef G0_FEEDRATE
     // Restore the motion mode feedrate
     if (fast_move) feedrate_mm_s = old_feedrate;

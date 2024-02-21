@@ -49,7 +49,7 @@
  *  MOSI_PIN       MOSI0        PWM 11 |               | 14  A0 PWM  TX3    *    TEMP_1_PIN
  *  MISO_PIN       MISO0        PWM 12 |               | 13 LED PWM  SCK0        SCK_PIN
  *                                3.3V |               | GND
- *  Z_STOP_PIN                  PWM 24 |               | 41 A17
+ *  Z_STOP_PIN                  PWM 24 |               | 41 A17                  BLTOUCH
  *  E0_ENABLE_PIN     *         PWM 25 |               | 40 A16
  *  FAN0_PIN       MOSI1            26 |               | 39 A15      MISO1       X_STOP_PIN
  *  Z-PROBE PWR    SCK1             27 | *  *  *  *  * | 38 A14                  Y_STOP_PIN
@@ -72,7 +72,7 @@
 #define X_STOP_PIN                            39
 #define Y_STOP_PIN                            38
 #define Z_STOP_PIN                            24
-
+#define Z_MIN_PROBE_PIN                       41
 //
 // Steppers
 //
@@ -86,23 +86,23 @@
 #define Y_ENABLE_PIN                           29
 //#define Y_CS_PIN                            31
 
-#define Z_STEP_PIN                             4
-#define Z_DIR_PIN                              5
+#define Z_STEP_PIN                             9//4
+#define Z_DIR_PIN                              10//5
 #define Z_ENABLE_PIN                           29
 //#define Z_CS_PIN                            32
 
-#define E0_STEP_PIN                            9
-#define E0_DIR_PIN                            10
+#define E0_STEP_PIN                           4// 9
+#define E0_DIR_PIN                            5//10
 #define E0_ENABLE_PIN                         29
 
 #define E1_STEP_PIN                           33
 #define E1_DIR_PIN                            34
-#define E1_ENABLE_PIN                         29
+//#define E1_ENABLE_PIN                         29
 
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN                          29//37
+#define HEATER_0_PIN                          37
 #define HEATER_1_PIN                          18
 #define HEATER_BED_PIN                        36
 #ifndef FAN0_PIN
